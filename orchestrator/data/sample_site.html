@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sample Boutique</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 0; }
+      header { background: #111; color: #fff; padding: 20px; }
+      .hero { display: grid; place-items: center; height: 50vh; background: #fafafa; }
+      .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 24px; }
+      .card { border: 1px solid #eee; padding: 12px; }
+      .btn { background: #0070f3; color: #fff; padding: 10px 16px; border-radius: 6px; border: 0; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Elegance — Women's Clothing</h1>
+    </header>
+    <section class="hero">
+      <div>
+        <h2>Discover the new collection</h2>
+        <p>Hand‑picked pieces to elevate your style.</p>
+        <button class="btn">Shop Now</button>
+      </div>
+    </section>
+    <section class="grid">
+      <div class="card"><img src="https://picsum.photos/seed/1/400/240" alt="Look 1" /><p>Look 1</p></div>
+      <div class="card"><img src="https://picsum.photos/seed/2/400/240" alt="Look 2" /><p>Look 2</p></div>
+      <div class="card"><img src="https://picsum.photos/seed/3/400/240" alt="Look 3" /><p>Look 3</p></div>
+    </section>
+  </body>
+</html>

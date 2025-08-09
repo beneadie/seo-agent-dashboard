@@ -34,6 +34,7 @@ interface AgentConfig {
   websiteUrl: string
   analyticsProperty: string
   agentName: string
+  scheduleMinutes?: string
 }
 
 export default function Dashboard() {
@@ -44,11 +45,14 @@ export default function Dashboard() {
     branch: 'main',
     websiteUrl: '',
     analyticsProperty: '',
-    agentName: ''
+    agentName: '',
+    scheduleMinutes: ''
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isConfigured, setIsConfigured] = useState(false)
   const [showToken, setShowToken] = useState(false)
+  const [reviewing, setReviewing] = useState(false)
+  const [lastInstruction, setLastInstruction] = useState<string | null>(null)
 
   const handleInputChange = (field: keyof AgentConfig, value: string) => {
     setConfig(prev => ({ ...prev, [field]: value }))
@@ -106,6 +110,9 @@ export default function Dashboard() {
           website_url: config.websiteUrl,
           analytics_property: config.analyticsProperty || null,
           agent_name: config.agentName,
+          schedule_minutes: config.scheduleMinutes && !isNaN(Number(config.scheduleMinutes))
+            ? Number(config.scheduleMinutes)
+            : null,
           timestamp: new Date().toISOString()
         })
       })
@@ -126,6 +133,26 @@ export default function Dashboard() {
     }
 
     setIsSubmitting(false)
+  }
+
+  const triggerReview = async () => {
+    setReviewing(true)
+    setLastInstruction(null)
+    try {
+      const resp = await fetch('/api/agent/review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_goal: 'Improve engagement based on GA mock data' }),
+      })
+      const json = await resp.json()
+      if (json?.ok && json?.data?.instruction) {
+        setLastInstruction(json.data.instruction)
+      }
+    } catch (e) {
+      console.error('review failed', e)
+    } finally {
+      setReviewing(false)
+    }
   }
 
   const setupProgress = (() => {
@@ -190,6 +217,28 @@ export default function Dashboard() {
                   analyze your repository and create pull requests with SEO improvements. All changes will be
                   reviewed by you before merging.
                 </p>
+              </div>
+
+              <Separator className="my-4" />
+              <div className="text-left space-y-3">
+                <Button onClick={triggerReview} disabled={reviewing} className="bg-blue-600 hover:bg-blue-700">
+                  {reviewing ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                      Running Review...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="h-4 w-4 mr-2" />
+                      Start Analytics Review and Update Site
+                    </>
+                  )}
+                </Button>
+                {lastInstruction && (
+                  <div className="text-sm text-green-900 bg-green-100 p-3 rounded border border-green-200">
+                    <strong>Last instruction:</strong> {lastInstruction}
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -426,6 +475,34 @@ export default function Dashboard() {
               value={config.analyticsProperty}
               onChange={(e) => handleInputChange('analyticsProperty', e.target.value)}
             />
+          </CardContent>
+        </Card>
+
+        {/* Scheduling - Optional */}
+        <Card className="border-2 border-gray-200">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Settings className="h-6 w-6 text-gray-700" />
+                <div>
+                  <CardTitle className="text-xl">Run Interval (Optional)</CardTitle>
+                  <CardDescription>Automatically run review every N minutes</CardDescription>
+                </div>
+              </div>
+              <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-200">
+                Optional
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Input
+              type="number"
+              min={1}
+              placeholder="e.g., 60"
+              value={config.scheduleMinutes}
+              onChange={(e) => handleInputChange('scheduleMinutes' as keyof AgentConfig, e.target.value)}
+            />
+            <p className="text-xs text-gray-600 mt-2">Leave empty to disable automatic runs</p>
           </CardContent>
         </Card>
 
