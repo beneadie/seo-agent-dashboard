@@ -1,0 +1,7 @@
+date,event_name,event_category,event_label,value
+2025-01-01,button_click,engagement,add_to_cart,34
+2025-01-01,image_view,engagement,hero_image,212
+2025-01-02,button_click,engagement,checkout,12
+2025-01-02,image_view,engagement,product_image,198
+2025-01-03,button_click,engagement,add_to_cart,28
+2025-01-03,image_view,engagement,hero_image,240
